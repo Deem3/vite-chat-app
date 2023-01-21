@@ -63,7 +63,7 @@ export default function Login() {
         required={true}
       />
       <div className="w-80 flex flex-col items-center">
-        <Button type="submit" className="w-full">Login</Button>
+        <Button type="submit" className="w-full bg-slate-600 hover:bg-slate-500 ring-slate-500">Login</Button>
         <p>or</p>
         <GoogleButton/>
       </div>

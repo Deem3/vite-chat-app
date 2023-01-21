@@ -18,6 +18,7 @@ export default function GoogleButton() {
     signInWithGoogle()
     .then((user)=>{
       setIsLoading(false)
+      sessionStorage.setItem('user', JSON.stringify(user))
       if(user){
         navigate('/')
       }
