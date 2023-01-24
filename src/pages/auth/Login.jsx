@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 // Components
 import Loading from '../../components/support/Loading'
@@ -22,6 +22,12 @@ export default function Login() {
   // sign in with email and password
   const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth)
 
+  useEffect(()=>{
+    if(user){
+      navigate('/')
+    }
+  }, [user])
+
   const handleSubmit = (e) =>{
     e.preventDefault()
     const email = e.target[0].value
@@ -29,8 +35,10 @@ export default function Login() {
 
     signInWithEmailAndPassword(email, password)
       .then((user)=>{
-        sessionStorage.setItem('user', JSON.stringify(user))
-        navigate('/')
+          sessionStorage.setItem('user', JSON.stringify(user))
+          if(!user){
+            sessionStorage.removeItem('user')
+          }
       })
       .catch((error)=>console.log(error))
   }

@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "host": "vite --host",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "classnames": "^2.3.2",
     "firebase": "^9.16.0",
     "flowbite": "^1.6.2",
     "flowbite-react": "^0.3.7",
@@ -16,7 +18,8 @@
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-icons": "^4.7.1",
-    "react-router-dom": "^6.7.0"
+    "react-router-dom": "^6.7.0",
+    "react-toastify": "^9.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

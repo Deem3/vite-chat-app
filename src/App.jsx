@@ -18,15 +18,12 @@ export default function App() {
   let [user] = useAuthState(auth)
   const userID = JSON.parse(sessionStorage.getItem('user'))
 
-  
   useEffect(() => {
-    if (!user && !userID) {
+    if (!userID) {
       navigate("/login");
     }
-    if(userID && !user){
       user = userID
-    }
-  }, [user]);
+  }, [user], [userID]);
 
 
   return (

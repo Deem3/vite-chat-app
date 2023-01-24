@@ -33,7 +33,9 @@ export default function Register() {
         updateProfile({displayName: displayName})
           navigate('/')
           sessionStorage.setItem("user", JSON.stringify(user))
-          
+          if(!user){
+            sessionStorage.removeItem('user')
+          }
       })
       .catch((error)=>{
         console.log(error)
