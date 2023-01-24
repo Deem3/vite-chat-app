@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 // style
 import { Avatar, Button, Spinner } from "flowbite-react";
 import {
@@ -7,19 +8,22 @@ import {
   pcDetail,
   pcGridMap,
 } from "../components/support/Styling";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 // firebase
-import { EmailAuthCredential, signInWithCredential } from "firebase/auth";
-import 'firebase/compat/auth'
-import firebase from 'firebase/compat/app'
+import { signInWithCredential } from "firebase/auth";
+import "firebase/compat/auth";
+import firebase from "firebase/compat/app";
 import { auth } from "../../utils/firebase";
 import {
   useAuthState,
   useUpdateProfile,
-  useUpdatePassword,
   useUpdateEmail,
   useDeleteUser,
   useSendEmailVerification,
+  useSendPasswordResetEmail,
 } from "react-firebase-hooks/auth";
 
 export default function Profile() {
@@ -27,14 +31,13 @@ export default function Profile() {
   // checking
   const [userNameClicked, setUserNameClicked] = useState(false);
   const [userEmailClicked, setUserEmailClicked] = useState(false);
-  const [userPasswordClicked, setUserPasswordClicked] = useState(false);
 
   // firebase
   const [updateProfile, updating] = useUpdateProfile(auth);
-  const [deleteUser, loading] = useDeleteUser(auth)
-  const [updateEmail] = useUpdateEmail(auth);
+  const [deleteUser, loading] = useDeleteUser(auth);
+  const [updateEmail, updateing] = useUpdateEmail(auth);
   const [sendEmailVerification, sending] = useSendEmailVerification(auth);
-  const [updatePassword] = useUpdatePassword(auth);
+  const [sendPasswordResetEmail, error] = useSendPasswordResetEmail(auth);
 
   // change Profile
   const [userName, setUserName] = useState(user.displayName);
@@ -46,60 +49,114 @@ export default function Profile() {
   // change email
   const [userEmail, setUserEmail] = useState(user.email);
   const handleEmail = async () => {
-    const success = await updateEmail(user,{ email: userEmail });
+    const success = await updateEmail(user, { email: userEmail });
     console.log(success);
     setUserEmailClicked(false);
   };
 
   // handle email verification
-  const handleVerify = async () => {
-    const success = await sendEmailVerification(user);
-    if (success) {
-      console.log("success sent mail");
-    }
+  const handleVerify = () => {
+    sendEmailVerification(user)
+      .then((success)=>{
+        toast.success('Verification email sent', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+      })
+      .catch((error)=>{
+        toast.error(error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+      })
   };
 
-  // handle password change
-  const [userPassword, setUserPassword] = useState("");
-  const handlePassword = async () => {
-      try {
-    const credential =  await firebase.auth.EmailAuthProvider.credential(user.email, prompt('Verify by your password'))
-    const result =  await signInWithCredential(auth, credential)
-    if(result.user){
-      const pass = await updatePassword(user, userPassword)
-        .then((res)=>{
-          if(res){alert(res)}
-        })
-        .catch((err)=>{
-          alert(err)
-          console.log(err)
-        })
-        alert(pass)
-    }
-      } catch (err) {
-        alert(err)
-        console.log(err)
-      }
-      
-    setUserPasswordClicked(false);
+  // handleReset
+  const handleReset = () => {
+    sendPasswordResetEmail(user.email)
+      .then((success) => {
+        alert('success')
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
+
   // handle delete user
   const handleDelete = async () => {
-    const success = await deleteUser()
-    console.log(success)
-    if(success){
-      sessionStorage.removeItem('user')
+    try {
+      const credential = await firebase.auth.EmailAuthProvider.credential(
+        user.email,
+        prompt("Verify by your password")
+      );
+      const result = await signInWithCredential(auth, credential);
+      if (result.user) {
+        deleteUser()
+          .then((res) => {
+            toast.success('Account deleted!', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              });
+            
+            sessionStorage.removeItem("user");
+          })
+          .catch((error) => toast.error(error, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            }));
+      }
+    } catch (error) {
+      toast.error('something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
     }
-    if(!success){
-      alert('something went wrong')
-    }
-  }
+  };
 
-
-
-  
   return (
     <div className={`${pcMain} bg-red-100`}>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        theme="light"
+      />
       <div className={pcAbout}>
         <Avatar rounded={true} img={user.photoURL} size="xl" />
         <h1>{updating ? <Spinner /> : user.displayName}</h1>
@@ -159,7 +216,7 @@ export default function Profile() {
                 className="text-blue-500 hover:text-blue-300 cursor-pointer"
                 onClick={() => setUserEmailClicked(true)}
               >
-                {updating ? <Spinner color="info" /> : "edit"}
+                {updateing ? <Spinner color="info" /> : "edit"}
               </p>
             )}
           </div>
@@ -171,43 +228,29 @@ export default function Profile() {
               className="text-blue-500 hover:text-blue-300 cursor-pointer"
               onClick={() => handleVerify()}
             >
-              {sending ? <Spinner color="info" /> : null}
-              {user.emailVerified ? null : "verify"}
+              {user.emailVerified ? null : <p>{sending ? <Spinner color="info" /> : 'verify'}</p>}
             </p>
           </div>
-          {/* password change */}
+          {/* password reset */}
           {user.providerData[0].providerId === "password" ? (
             <div className={pcGridMap}>
               <p>Password</p>
-              <input
-                type="password"
-                value={userPassword}
-                onChange={(e) => setUserPassword(e.target.value)}
-                disabled={userPasswordClicked ? false : true}
-                className="focus:outline-none focus:ring-0 border-none bg-transparent p-0"
-              />
-              {/* user.providerData[0].providerId */}
-              {userPasswordClicked ? (
-                <p
-                  className="cursor-pointer text-blue-500 hover:text-blue-300"
-                  onClick={() => handlePassword()}
-                >
-                  change
-                </p>
-              ) : (
-                <p
-                  className="cursor-pointer text-blue-500 hover:text-blue-300"
-                  onClick={() => setUserPasswordClicked(true)}
-                >
-                  {updating ? <Spinner color="info" /> : 'edit'}
-                </p>
-              )}
+              <p></p>
+              <p
+                className="text-blue-500 hover:text-blue-300 cursor-pointer"
+                onClick={() => handleReset()}
+              >
+                reset
+              </p>
             </div>
           ) : null}
 
           {/* delete account */}
-          <Button onClick={()=>handleDelete()} className="sm:my-6 bg-red-600 focus:ring-red-400 hover:bg-red-400">
-            {loading ? <Spinner color="failure"/> : "Delete"}
+          <Button
+            onClick={() => handleDelete()}
+            className="sm:my-6 bg-red-600 focus:ring-red-400 hover:bg-red-400"
+          >
+            {loading ? <Spinner color="failure" /> : "Delete"}
           </Button>
         </div>
       </div>

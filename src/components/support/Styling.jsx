@@ -12,3 +12,4 @@ export const pcAbout = classNames(
 export const pcGridMap = classNames(
   "grid grid-cols-3 sm:gap-x-32 sm:border-b-2 sm:py-3 sm:border-slate-600"
 );
+
