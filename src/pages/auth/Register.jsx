@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 // Firebase
-import { auth } from '../../../utils/firebase';
+import { auth } from '../../utils/firebase';
 import { useCreateUserWithEmailAndPassword,  useUpdateProfile} from 'react-firebase-hooks/auth';
 // Components
 import Loading from '../../components/support/Loading'
 import GoogleButton from '../../components/GoogleButton'
 // Context
-import { useLoading } from '../../../utils/context/LoadingContext';
+import { useLoading } from '../../utils/context/LoadingContext';
 // Styles
 import { TextInput, Button } from 'flowbite-react';
 import {GiRaiseZombie} from 'react-icons/gi'

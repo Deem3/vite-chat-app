@@ -3,7 +3,7 @@ import {ImProfile} from 'react-icons/im'
 import { Navbar, Button } from "flowbite-react";
 import {HiChatAlt2, HiUser, HiInformationCircle} from 'react-icons/hi'
 import { useSignOut } from "react-firebase-hooks/auth";
-import { auth } from "../../utils/firebase";
+import { auth } from "../utils/firebase";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loading from '../components/support/Loading'
 

@@ -16,7 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { signInWithCredential } from "firebase/auth";
 import "firebase/compat/auth";
 import firebase from "firebase/compat/app";
-import { auth } from "../../utils/firebase";
+import { auth } from "../utils/firebase";
 import {
   useAuthState,
   useUpdateProfile,
@@ -42,15 +42,43 @@ export default function Profile() {
   // change Profile
   const [userName, setUserName] = useState(user.displayName);
   const handleName = (e) => {
-    updateProfile({ displayName: userName });
+    updateProfile({ displayName: userName }).then((success)=>{
+      toast.success('Username Changed', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+    }).catch((error)=>{
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+    })
     setUserNameClicked(false);
   };
 
   // change email
   const [userEmail, setUserEmail] = useState(user.email);
   const handleEmail = async () => {
-    const success = await updateEmail(user, { email: userEmail });
-    console.log(success);
+    try {
+      const credential = await firebase.auth.EmailAuthProvider.credential(user.email, prompt('enter your password please'))
+      const result = await signInWithCredential(auth, credential).then((succ)=>{
+        updateEmail({email: userEmail}).then((res)=>alert('success')).catch((error)=>alert(error))
+      }).catch((error)=>alert(error))
+    } catch (error) {
+      
+    }
     setUserEmailClicked(false);
   };
 
@@ -205,19 +233,19 @@ export default function Profile() {
               className="focus:outline-none focus:ring-0 border-none bg-transparent p-0"
             />
             {userEmailClicked ? (
-              <p
+              <div
                 className="hover:text-blue-300 text-blue-500 cursor-pointer"
                 onClick={() => handleEmail()}
               >
                 change
-              </p>
+              </div>
             ) : (
-              <p
+              <div
                 className="text-blue-500 hover:text-blue-300 cursor-pointer"
                 onClick={() => setUserEmailClicked(true)}
               >
                 {updateing ? <Spinner color="info" /> : "edit"}
-              </p>
+              </div>
             )}
           </div>
           {/* Email verification */}

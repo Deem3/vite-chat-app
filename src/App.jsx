@@ -9,7 +9,7 @@ import Profile from "./pages/Profile";
 // Components
 import MyNavbar from "./components/Navbar";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../utils/firebase";
+import { auth } from "./utils/firebase";
 
 export default function App() {
   // checking is there authorized user 

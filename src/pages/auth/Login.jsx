@@ -4,9 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import Loading from '../../components/support/Loading'
 import GoogleButton from '../../components/GoogleButton'
 // Context
-import { useLoading } from '../../../utils/context/LoadingContext';
+import { useLoading } from '../../utils/context/LoadingContext';
 // Firebase
-import { auth } from '../../../utils/firebase';
+import { auth } from '../../utils/firebase';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 // Styles
 import { TextInput, Button } from 'flowbite-react';

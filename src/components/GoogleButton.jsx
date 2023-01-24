@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 // Firebase
-import {auth} from '../../utils/firebase'
+import {auth} from '../utils/firebase'
 import {useSignInWithGoogle} from 'react-firebase-hooks/auth'
 // Context
-import {useLoading} from '../../utils/context/LoadingContext'
+import {useLoading} from '../utils/context/LoadingContext'
 
 
 export default function GoogleButton() {
