@@ -44,3 +44,19 @@ export const mbMainAbout = classNames(
 export const mbDetailAbout = classNames(
   "p-12 flex flex-col justify-center items-center mb-40 [&>*]:my-8"
 )
+
+{/*------------------------ Home -------------------------*/}
+
+export const mbHomeMain = classNames(
+  "m-2 border-4 border-slate-600 max-h-[80vh] min-h-[70vh]"
+)
+
+export const mbHomeProfileBorder = classNames(
+  "h-16 border-b-4 border-slate-600"
+)
+
+{/*------------------------ Chatting section -------------------------*/}
+
+export const mbChatMain = classNames(
+  "m-2 border-4 border-slate-600 max-h-[80vh] min-h-[70vh]"
+)

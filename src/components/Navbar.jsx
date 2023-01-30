@@ -25,7 +25,7 @@ export default function MyNavbar() {
   return (
     <div>
       <Navbar fluid={true} rounded={true} className='shadow-lg rounded-b-xl shadow-blue-200'>
-        <Navbar.Brand href="https://vite-chat-app-deem3.vercel.app/">
+        <Navbar.Brand href="/">
           <img
             src="zombie.svg"
             className="mr-3 h-10 sm:h-9"

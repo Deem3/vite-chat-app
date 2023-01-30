@@ -23,6 +23,7 @@ import {
 // styling
 import { Avatar } from "flowbite-react";
 import { FiSend } from "react-icons/fi";
+import {mbChatMain} from '../components/support/Styling'
 
 
 
@@ -85,8 +86,8 @@ export default function Chat() {
   return chats?.map((chat)=>{
     if(id===chat.id)
     return(
-    <div className="bg-white rounded-lg shadow-xl container mx-auto mt-12 h-[75vh] w-[32vw] border-2 border-slate-500 overflow-hidden">
-      <div className="bg-white h-16 border-b-2 border-slate-500 shadow-lg flex justify-start items-center">
+      <div className={`bg-white rounded-lg shadow-xl md:container md:mx-auto md:mt-12 md:h-[75vh] md:w-[32vw] md:border-2 md:border-slate-500 overflow-hidden ${mbChatMain}`}>
+      <div className="bg-white h-16 border-b-4 border-slate-600 md:border-b-2 md:border-slate-500 shadow-lg flex justify-start items-center">
         <Avatar rounded="3xl" img={chat.photoURL[0] === user.photoURL ? chat.photoURL[1] : chat.photoURL[0]} className="ml-6 mr-6" />
         <h1 className="text-slate-500 text-3xl font-semibold capitalize">
           {chat.displayName === user.displayName[0] ? chat.displayName[1] : chat.displayName[0]}
@@ -95,7 +96,7 @@ export default function Chat() {
       <div className="h-[541px] p-2 overflow-scroll scrollbar-hide bg-white">
         <Message />
       </div>
-      <div className="h-[50px] bg-red-100 border-t-2 border-slate-500 relative">
+      <div className="h-[50px] bg-red-100 border-t-4 border-slate-600 md:border-t-2 md:border-slate-500 relative">
         <input
           type="text"
           className="w-full h-full overflow-hidden focus:ring-transparent focus:outline-none focus:border-none border-none"

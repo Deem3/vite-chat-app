@@ -8,6 +8,7 @@ import { Avatar } from "flowbite-react";
 import { HiUserAdd } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { mbHomeMain, mbHomeProfileBorder } from "../components/support/Styling";
 
 // firebase
 import { auth } from "../utils/firebase";
@@ -52,7 +53,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-xl container mx-auto mt-12 h-[75vh] w-[32vw] border-2 border-slate-500 overflow-hidden">
+    <div className={`bg-white rounded-lg md:shadow-xl md:container md:mx-auto md:mt-12 md:h-[75vh] md:w-[32vw] md:border-2 md:border-slate-500 md:overflow-hidden ${mbHomeMain}`}>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -65,17 +66,17 @@ export default function Home() {
         pauseOnHover={false}
         theme="light"
       />
-      <div className="bg-white h-16 border-b-2 border-slate-500 shadow-lg flex justify-between items-center">
+      <div className={`md:bg-white md:h-16 md:border-b-2 md:border-slate-500 md:shadow-lg flex justify-between items-center ${mbHomeProfileBorder}`}>
         <div className="flex items-center">
           <Avatar rounded="3xl" img={user.photoURL} className="ml-6 mr-6" />
-          <h1 className="text-slate-500 text-3xl font-semibold capitalize truncate whitespace-no-wrap">
+          <h1 className="text-slate-500 md:text-3xl text-xl font-semibold capitalize truncate whitespace-no-wrap">
             {user.displayName}
           </h1>
         </div>
         <div className="flex items-center">
           <input
             type="email"
-            className="rounded-lg border-none w-40"
+            className="rounded-lg border-none md:w-40 max-w-[7rem]"
             placeholder="add friend"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -87,7 +88,7 @@ export default function Home() {
           />
         </div>
       </div>
-      <div className="bg-white h-[591px] p-2 overflow-scroll scrollbar-hide">
+      <div className="md:bg-white md:h-[591px] p-2 md:overflow-scroll md:scrollbar-hide">
         <ChatMember />
       </div>
     </div>
