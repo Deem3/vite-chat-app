@@ -6,6 +6,7 @@ import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
+import Chat from './pages/Chat'
 // Components
 import MyNavbar from "./components/Navbar";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -32,7 +33,9 @@ export default function App() {
         <Routes>
           {user ? <><Route path="/" element={<><MyNavbar/><Home/></>}/>
           <Route path="/profile" element={<><MyNavbar/><Profile/></>}/>
-          <Route path="/about" element={<><MyNavbar/><About/></>}/></> : null}
+          <Route path="/about" element={<><MyNavbar/><About/></>}/>
+          <Route path="/:id" element={<><MyNavbar/><Chat/></>}/>
+          </> : null}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Routes>

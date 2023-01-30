@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 // Firebase
-import {auth} from '../utils/firebase'
+import {auth, db} from '../utils/firebase'
+import {doc, setDoc} from 'firebase/firestore'
 import {useSignInWithGoogle} from 'react-firebase-hooks/auth'
 // Context
 import {useLoading} from '../utils/context/LoadingContext'
@@ -14,18 +15,23 @@ export default function GoogleButton() {
   const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth)
 
 
-  const handleClick = () => {
-    signInWithGoogle()
-    .then((user)=>{
-      setIsLoading(false)
-      sessionStorage.setItem('user', JSON.stringify(user))
-      if(user){
-        navigate('/')
-      }
-    })
-    .catch((err)=>{
-      setIsLoading(false)
-    })
+  const handleClick = async () => {
+      await signInWithGoogle("", {})
+        .then(async(userCredential)=>{
+          await setDoc(doc(db, 'user', userCredential.user.uid),{
+            uid: userCredential.user.uid,
+            displayName: userCredential.user.displayName,
+            email: userCredential.user.email,
+            photoURL: userCredential.user.photoURL
+          })
+          sessionStorage.setItem('user', JSON.stringify(userCredential.user))
+          setIsLoading(false)
+          if(userCredential){ 
+            navigate('/')
+          }
+        }).catch((error)=>{
+          alert(error)
+        })
   }
 
   

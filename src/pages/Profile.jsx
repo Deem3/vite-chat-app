@@ -1,22 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 // style
 import { Avatar, Button, Spinner } from "flowbite-react";
+// pc display size
 import {
   pcMain,
   pcAbout,
   pcDetail,
   pcGridMap,
 } from "../components/support/Styling";
+// mobile display size
+import {
+  mbAbout,
+  mbDetail,
+  mbGridMap
+} from '../components/support/Styling'
+import {GoVerified} from 'react-icons/go'
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 
 // firebase
 import { signInWithCredential } from "firebase/auth";
+import {doc, updateDoc, deleteDoc} from 'firebase/firestore' 
 import "firebase/compat/auth";
 import firebase from "firebase/compat/app";
-import { auth } from "../utils/firebase";
+import { auth, storage, db } from "../utils/firebase";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'firebase/storage'
 import {
   useAuthState,
   useUpdateProfile,
@@ -41,8 +55,14 @@ export default function Profile() {
 
   // change Profile
   const [userName, setUserName] = useState(user.displayName);
-  const handleName = (e) => {
-    updateProfile({ displayName: userName }).then((success)=>{
+  const handleName = async(e) => {
+    await updateProfile({ displayName: userName }).then(async()=>{
+      await updateDoc(doc(db, 'user', user.uid),{
+        uid: user.uid,
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL
+      })
       toast.success('Username Changed', {
         position: "top-right",
         autoClose: 5000,
@@ -74,7 +94,7 @@ export default function Profile() {
     try {
       const credential = await firebase.auth.EmailAuthProvider.credential(user.email, prompt('enter your password please'))
       const result = await signInWithCredential(auth, credential).then((succ)=>{
-        updateEmail({email: userEmail}).then((res)=>alert('success')).catch((error)=>alert(error))
+        updateEmail(auth.currentUser, {email: userEmail}).then((res)=>alert('success')).catch((error)=>alert(error))
       }).catch((error)=>alert(error))
     } catch (error) {
       
@@ -123,17 +143,34 @@ export default function Profile() {
   };
 
   // handle delete user
+  
   const handleDelete = async () => {
     try {
       const credential = await firebase.auth.EmailAuthProvider.credential(
         user.email,
         prompt("Verify by your password")
       );
-      const result = await signInWithCredential(auth, credential);
-      if (result.user) {
-        deleteUser()
-          .then((res) => {
-            toast.success('Account deleted!', {
+      await signInWithCredential(auth, credential)
+        .then(async(userCredential)=>{
+          await deleteDoc(doc(db, 'user', user.uid))
+          await deleteUser()
+            .then((res) => {
+              toast.success('Account deleted!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                });
+              
+              sessionStorage.removeItem("user");
+            })
+        })
+          
+            .catch((error) => toast.error(error, {
               position: "top-right",
               autoClose: 5000,
               hideProgressBar: false,
@@ -142,11 +179,59 @@ export default function Profile() {
               draggable: true,
               progress: undefined,
               theme: "light",
-              });
-            
-            sessionStorage.removeItem("user");
+              }));
+      }catch (error) {
+        toast.error('something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+      }
+    };
+
+  // useref
+
+  const fileInput = useRef(null)
+
+  // update profile picture
+const handleUpload = () => {
+  fileInput.current.click()
+}    
+
+const handleFileChange = async(e) =>{
+  const file = e.target.files[0]
+  try {
+    const storageRef = ref(storage, user.email)
+    const uploadTask = uploadBytesResumable(storageRef, file)
+
+    uploadTask.on(
+      (error) => {
+        toast.error('something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+      },
+      ()=>{
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL)=>{
+          await updateProfile({photoURL: downloadURL})
+          await updateDoc(doc(db, 'user', user.uid),{
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: downloadURL
           })
-          .catch((error) => toast.error(error, {
+          toast.success('Profile successfuly updated!', {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -155,24 +240,28 @@ export default function Profile() {
             draggable: true,
             progress: undefined,
             theme: "light",
-            }));
-      }
-    } catch (error) {
-      toast.error('something went wrong!', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+            });
         });
-    }
-  };
+      }
+    )
+  } catch (error) {
+    toast.error('something went wrong!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+  }
+}
+
+  // main render
 
   return (
-    <div className={`${pcMain} bg-red-100`}>
+    <div className={`${pcMain}`}>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -185,20 +274,21 @@ export default function Profile() {
         pauseOnHover={false}
         theme="light"
       />
-      <div className={pcAbout}>
-        <Avatar rounded={true} img={user.photoURL} size="xl" />
+      <div className={`${pcAbout} ${mbAbout}`}>
+        {updating ? <Spinner size="xl"/> : <Avatar rounded={true} img={user.photoURL} size="xl" />}
         <h1>{updating ? <Spinner /> : user.displayName}</h1>
-        <Button className="hover:bg-slate-400 transition-all duration-[400ms]">
+        <Button className="hover:bg-slate-400 transition-all duration-[400ms] bg-slate-600 mb-10" onClick={handleUpload}>
           Update Profile Picture
         </Button>
+        <input type="file" className="hidden" ref={fileInput} onChange={(e)=>handleFileChange(e)}/>
       </div>
-      <div className={pcDetail}>
+      <div className={`${pcDetail} ${mbDetail}`}>
         <p className="sm:my-12 sm:text-2xl sm:font-semibold">Profile</p>
         <div className="sm:grid">
           {/* userName change */}
 
-          <div className={pcGridMap}>
-            <p>Username</p>
+          <div className={`${pcGridMap} ${mbGridMap}`}>
+            <p className="text-start">Username</p>
             <input
               className="focus:outline-none focus:ring-0 border-none bg-transparent p-0"
               type="text"
@@ -223,8 +313,8 @@ export default function Profile() {
             )}
           </div>
           {/* Email change */}
-          <div className={pcGridMap}>
-            <p>Email</p>
+          <div className={`${pcGridMap} ${mbGridMap}`}>
+            <p className="text-start">Email</p>
             <input
               type="email"
               value={userEmail}
@@ -249,20 +339,21 @@ export default function Profile() {
             )}
           </div>
           {/* Email verification */}
-          <div className={pcGridMap}>
-            <p>Email verified</p>
-            <p>{user.emailVerified ? "verified" : "not verified"}</p>
-            <p
-              className="text-blue-500 hover:text-blue-300 cursor-pointer"
+          <div className={`${pcGridMap} ${mbGridMap}`}>
+            <p className="text-start">Verified</p>
+            <p className="text-start">{user.emailVerified ? "verified" : "not verified"}</p>
+            <button
+              className={`${user.emailVerified ? "text-blue-500" : "text-blue-500 hover:text-blue-300 cursor-pointer "} flex items-center justify-end`}
               onClick={() => handleVerify()}
+              disabled={user.emailVerified ? true : false}
             >
-              {user.emailVerified ? null : <p>{sending ? <Spinner color="info" /> : 'verify'}</p>}
-            </p>
+              {user.emailVerified ? <GoVerified/> : <p>{sending ? <Spinner color="info" /> : 'verify'}</p>}
+            </button>
           </div>
           {/* password reset */}
           {user.providerData[0].providerId === "password" ? (
-            <div className={pcGridMap}>
-              <p>Password</p>
+            <div className={`${pcGridMap} ${mbGridMap}`}>
+              <p className="text-start">Password</p>
               <p></p>
               <p
                 className="text-blue-500 hover:text-blue-300 cursor-pointer"
@@ -275,8 +366,9 @@ export default function Profile() {
 
           {/* delete account */}
           <Button
+          disabled={user.providerData[0].providerId === 'google.com' ? true : false}
             onClick={() => handleDelete()}
-            className="sm:my-6 bg-red-600 focus:ring-red-400 hover:bg-red-400"
+            className="sm:my-6 bg-red-600 focus:ring-red-400 hover:bg-red-400 w-full mt-4 disabled:bg-red-600 disabled:hover:bg-red-600"
           >
             {loading ? <Spinner color="failure" /> : "Delete"}
           </Button>

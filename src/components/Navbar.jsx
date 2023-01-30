@@ -4,15 +4,17 @@ import { Navbar, Button } from "flowbite-react";
 import {HiChatAlt2, HiUser, HiInformationCircle} from 'react-icons/hi'
 import { useSignOut } from "react-firebase-hooks/auth";
 import { auth } from "../utils/firebase";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Loading from '../components/support/Loading'
 
 
 export default function MyNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const {id} = useParams()
   const [signOut, loading, error] = useSignOut(auth);
   const handleClick = () => {
+    
     signOut()
     sessionStorage.removeItem('user')
   }
@@ -40,7 +42,7 @@ export default function MyNavbar() {
         <Navbar.Collapse>
           <div className="p-1 border-2 [&>*]:hover:rounded-md [&>*]:p-2 border-slate-400 rounded-lg [&>*]:my-1 [&>*]:mx-1 md:[&>*]:my-0 md:flex md:border-none md:space-x-3 md:p-0 cursor-pointer">
             <p
-              className={`flex items-center hover:bg-slate-500 [&>*]:hover:text-white hover:text-white transition-all duration-300 ${location.pathname === '/' ? 'bg-slate-500 rounded-md text-white [&>*]:text-white' : ''}`}
+              className={`flex items-center hover:bg-slate-500 [&>*]:hover:text-white hover:text-white transition-all duration-300 ${location.pathname === '/' || location.pathname === `/${id}` ? 'bg-slate-500 rounded-md text-white [&>*]:text-white' : ''}`}
               onClick={() => navigate("/")}
             >
               Chat
