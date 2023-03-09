@@ -4,14 +4,14 @@
 
 ## Installation
 
-github-аас энэ кодыг clone хийж аваад Nodejs ашиглан ажилуулна
+github-аас энэ кодыг clone хийж аваад Nodejs ашиглан ажиллуулна
 
 ```bash
 npm i
 ```
 
 ## Usage
-Localhost дээр ажилуулна
+Localhost дээр ажиллуулна
 ```javascript
 npm run dev
 ```
