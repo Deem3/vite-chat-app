@@ -50,6 +50,9 @@ export default function Chat() {
   
   // send Messages
   const handleSend = async (e) => {
+    if (msg == ""){
+      return;
+    }
     const encryptedMsg = AES.encrypt(msg, password).toString()
     const msgRef = collection(db, `chats/${id}/chat`);
     await addDoc(msgRef, {
